@@ -23,6 +23,7 @@ export const login = async ( user ) => {
 			}
 		}
 	}catch (error){
+		console.log(error)
 		return {
 			status: 409,
 			entity: {

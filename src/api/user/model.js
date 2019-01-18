@@ -12,7 +12,6 @@ mongoose.plugin(slug, {
 })
 
 const roles = ['user', 'admin']
-const userType = ['STUDENT', 'TEACHER', 'INSTITUTE']
 
 const userSchema = new Schema({
 	phone: {
@@ -31,7 +30,6 @@ const userSchema = new Schema({
 		lowercase: true
 	},
 	role: {type: String, enum: roles, default: 'user'},
-	userType: {type: String, enum: userType, default: 'STUDENT'},
 	slugName: {type: String, lowercase: true, required: true},
 	userName: {type: String, slug: 'slugName', slug_padding_size: 3, unique: true},
 	password: {type: String, required: true, minlength: 6},
@@ -40,24 +38,6 @@ const userSchema = new Schema({
 		lastName: {type: String, required: true}
 	},
 	picture: {type: String, trim: true},
-	basicInfo: { type: String, default: ''},
-	education: [{
-		degree: {type: String, ref: 'Degree', required: true},
-		school: {type: String, ref: 'School', required: true},
-		field: String,
-		start: Number,
-		end: Number,
-		isCurrent: {type: Boolean, default: false}
-	}],
-	experience: [{
-		company: {type: String, required: true},
-		designation: {type: String, required: true},
-		start: Number,
-		end: Number,
-		isCurrent: {type: Boolean, default: false}
-	}],
-	topic: [{type: String, ref: 'Topic', required: true}],
-	teachers: [{type: String, ref: 'User', required: true}],
 	services: {
 		facebook: String,
 		google: String
@@ -81,16 +61,10 @@ userSchema.pre('save', function (next) {
 userSchema.methods = {
 	view (full) {
 		let view = {}
-		let fields = ['id', 'name', 'picture', 'basicInfo', 'education', 'experience']
-		if(this.userType !== 'STUDENT'){
-			fields.push('topic')
-		}
-		if(this.userType === 'INSTITUTE'){
-			fields.push('teachers')
-		}
+		let fields = ['id', 'name', 'picture']
 
 		if (full) {
-			fields = [...fields, 'phone', 'userType', 'userName', 'email', 'createdAt']
+			fields = [...fields, 'phone', 'userName', 'email', 'createdAt']
 		}
 
 		fields.forEach((field) => { view[field] = this[field] })

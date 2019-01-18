@@ -5,6 +5,7 @@ import { Text } from './model'
 
 export const sendMessage = async (body) => {
 	try{
+		console.log(body.message)
 		const response = await Text.create(body)
 		if(response._id){
 			if(sendText){
@@ -85,6 +86,9 @@ export const sendVerificationCode = async ( { phone, message, verificationCode} 
 export const verifyVerificationCode = async ( { phone, verificationCode, verificationToken } ) => {
 	try{
 		const decodedToken = jwtVerify(verificationToken)
+		console.log(decodedToken.phone == phone)
+		console.log(decodedToken.verificationCode)
+		console.log(verificationCode)
 		if(decodedToken.phone == phone && decodedToken.verificationCode == verificationCode){
 			return {
 				status: 200,
@@ -102,6 +106,7 @@ export const verifyVerificationCode = async ( { phone, verificationCode, verific
 			}
 		}
 	}catch(error){
+		console.log(error)
 		return {
 			status: 400,
 			entity: {

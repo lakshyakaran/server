@@ -9,7 +9,7 @@ export const sendOtp = async ( body ) => {
 	try{
 		const phone = body.phone
 		const verificationCode = generateRandomDigits(4)
-		const message = `${verificationCode} is your OTP to register on HopIn. The OTP is valid for 5 mins. Please do not share it with anyone.`
+		const message = `${verificationCode} is your OTP to register on Tasty slop. The OTP is valid for 5 mins. Please do not share it with anyone.`
 		const response = await sendVerificationCode({ phone, verificationCode, message })
 		if(response.status === 200){
 			return {
@@ -84,6 +84,7 @@ export const create = async ( body ) => {
 			}
 		}
 	}catch (error){
+		console.log(error)
 		if (error.name === 'MongoError' && error.code === 11000) {
 			return {
 				status: 409,
