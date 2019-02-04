@@ -1,23 +1,13 @@
 import mongoose, { Schema } from 'mongoose'
 
-const mealsIncluded = ['BREAKFAST', 'LUNCH', 'DINNER']
-
 const subscriptionSchema = new Schema({
-	planName: {
-		type: String, required: true
-	},
-	days: {
-		type: Number, required: true
-	},
-	mealsCount: {
-		type: Number, required: true
-	},
-	mealsIncluded:[{
-		type: String, enum: mealsIncluded, required: true
-	}],
-	price: {
-		type: Number, required: true
-	}
+	planId: {type: String, required: true},
+	userId: {type: String, default: true},
+	startDate: {type: Number, required: true},
+	endDate: {type: Number, required: true},
+	mealsAvailable: {type: String, required: true},
+	suscribedOn: {type: Number, required: true},
+	status: {type: String, enum: ['SUBSCRIBED', 'EXPIRED'], required: true},
 }, {
 	timestamps: true
 })

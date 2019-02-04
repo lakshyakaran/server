@@ -26,6 +26,7 @@ const config = {
 		root: path.join(__dirname, '..'),
 		port: process.env.PORT || 9000,
 		ip: process.env.IP || '0.0.0.0',
+		siteBase: 'http://localhost:9000',
 		apiRoot: process.env.API_ROOT || '',
 		xApiKey: requireProcessEnv('X_API_KEY'),
 		jwtSecret: requireProcessEnv('JWT_SECRET'),
@@ -54,6 +55,17 @@ const config = {
 			uri: 'mongodb://localhost/tastyslop-dev',
 			options: {
 				debug: true
+			}
+		},
+		payu: {
+			merchantID: 5804204,
+			key: 'CmB8BBqg',
+			salt: 'WDHB59ixeb',
+			authorizationHeader: '3pWPY6neZmhLNInNvdQFdKBHXxfdi6UKV61UEOQqd7o=',
+			host: 'https://www.payumoney.com/sandbox',
+			path: {
+				refundEndpoint: '/treasury/merchant/refundPayment',
+				paymentResponse: '/payment/op/getPaymentResponse'
 			}
 		}
 	},
