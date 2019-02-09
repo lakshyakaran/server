@@ -8,6 +8,7 @@ const transactionSchema = new Schema({
 	transactionType: {type: String, enum : transactionType, required: true},
 	transactionHandler: {type: String},
 	transactionAmount: {type: Number, required: true},
+	orderId: {type: String, default: null},
 	transactionData: {type: Object, default: null},
 	status: {type: String, enum: status, default: 'PENDING'}
 }, {

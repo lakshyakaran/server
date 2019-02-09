@@ -1,6 +1,7 @@
 import _ from 'lodash'
 import { hashBeforeTransaction, hashAfterTransaction } from '../../services/crypto'
-import { payu, siteBase } from '../../config'
+import { createOrder } from '../../services/razorpay'
+import { razorpay, siteBase, siteName } from '../../config'
 import { show as showPlan } from '../plan/controller'
 import { create as createSubscription } from '../subscription/controller'
 import { Transaction } from './model'
@@ -20,32 +21,40 @@ export const initiateTransaction = async (body, {_id, email, phone, name}) => {
 				user: _id,
 				plan: planResponse.entity.plan,
 				transactionType: 'CHARGED',
-				transactionHandler: 'payUMoney',
+				transactionHandler: 'RazorPay',
 				transactionAmount: amountToPay,
 				status: 'PENDING'
 			}
 			const transaction = await Transaction.create(transactionData)
 			if(transaction._id){
-				const generatedHash = hashBeforeTransaction({
-					'key': payu.key,
-					'txnid': transaction._id.toString(),
-					'amount': amountToPay,
-					'productinfo': 'Meal Subscription',
-					'firstname': name.firstName,
-					'email': email ? email : ''
+				console.log(transaction._id)
+				const orderId = await createOrder({
+					amount: amountToPay,
+					currency: 'INR',
+					receipt: transaction._id.toString()
 				})
+				transaction.orderId = orderId
+				await transaction.save()
 				const generatedRequestData = {
-					'key': payu.key,
-					'txnid': transaction._id.toString(),
-					'firstname': name.firstName,
-					'lastname': name.lastname,
-					'email': email ? email : '',
-					'phone': phone,
-					'productinfo': 'Meal Subscription',
+					'key': razorpay.id,
+					'image': 'https://i.imgur.com/3g7nmJC.png',
+					'description': 'Meal Subscription',
 					'amount': amountToPay,
-					'surl': siteBase + '/transactions/update',
-					'furl': siteBase + '/transactions/update',
-					'hash': generatedHash
+					'currency': 'INR',
+					'external': {
+						wallets: ['paytm']
+					},
+					'name': siteName,
+					'prefill': {
+						'email': email ? email : '',
+						'contact': phone,
+						'name': name.firstName + (name.lastname ? ' ' + name.lastname : ''),
+					},
+					'order_id': transaction.orderId,
+					'theme': {
+						'emi_mode': true
+					}
+					// 'hash': generatedHash
 				}
 				return {
 					status: 200,
@@ -77,7 +86,7 @@ export const initiateTransaction = async (body, {_id, email, phone, name}) => {
 
 export const updateTransaction = async (body) => {
 	try{
-		const transaction = await Transaction.findById(body.txnid)
+		const transaction = await Transaction.findById(body.txid)
 		if(transaction._id && transaction.status === 'PENDING' && transaction.transactionAmount > 0){
 			const plan = await showPlan(transaction.plan).entity.plan
 			const generatedHash = hashAfterTransaction(body, body.status)
